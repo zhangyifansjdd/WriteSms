@@ -1,0 +1,24 @@
+group 'com.zyf'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+def mainClassName = "com.zyf.Main"
+jar{
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies{
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+}
+
