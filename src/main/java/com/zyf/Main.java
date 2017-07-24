@@ -10,6 +10,13 @@ import java.io.FileNotFoundException;
  * Created by ZhangYifan on 2017/7/24.
  */
 public class Main {
+    /**
+     * 可以使用命令行的方式运行
+     * java -jar WriteSms-1.0-SNAPSHOT.jar 0 2  G:/testfile.xlsx
+     *
+     * 后跟3个参数  端口号索引  原文索引 Excel文件绝对路径
+     * @param args
+     */
     public static void main(String[] args) {
         System.out.println("--------开始执行-------");
         System.out.println("--------读取参数-------");
