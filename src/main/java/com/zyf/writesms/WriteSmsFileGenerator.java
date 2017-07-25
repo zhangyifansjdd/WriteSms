@@ -1,6 +1,8 @@
 package com.zyf.writesms;
 
 import com.zyf.excel.ExcelReader;
+import com.zyf.i.Printer;
+import com.zyf.i.Skiper;
 
 import java.io.*;
 
@@ -11,21 +13,17 @@ public class WriteSmsFileGenerator {
     private static final String SPLIT = "$;$";
     private static final String DEFAULT_TIME = "2016-12-05 10:24:03";
     private ExcelReader mReader;
-    private WriteSmsFileGenerator.Skiper mSkiper;
+    private Skiper mSkiper;
     private int mPortIndex = -1;
     private int mContentIndex = -1;
-    private String mTime = "2016-12-05 10:24:03";
+    private String mTime = DEFAULT_TIME;
     private File mTargetFile;
 
-    private WriteSmsFileGenerator(ExcelReader reader) {
+    public WriteSmsFileGenerator(ExcelReader reader) {
         this.mReader = reader;
     }
 
-    public static WriteSmsFileGenerator create(ExcelReader reader) {
-        return new WriteSmsFileGenerator(reader);
-    }
-
-    public WriteSmsFileGenerator setSkiper(WriteSmsFileGenerator.Skiper skiper) {
+    public WriteSmsFileGenerator setSkiper(Skiper skiper) {
         this.mSkiper = skiper;
         return this;
     }
@@ -55,13 +53,13 @@ public class WriteSmsFileGenerator {
     }
 
     public int writeResult2File() {
-        if (this.mTargetFile == null) {
+        if (mTargetFile == null) {
             File excelFile = this.mReader.getFile();
             File parentFile = excelFile.getParentFile();
             String excelFileName = excelFile.getName();
             String suffix = excelFileName.substring(excelFileName.lastIndexOf(".") + 1);
             String targetFileName = "writeSmsFrom-" + excelFileName.replace(suffix, "") + ".txt";
-            this.mTargetFile = new File(parentFile, targetFileName);
+            mTargetFile = new File(parentFile, targetFileName);
         }
         int count = 0;
 
@@ -80,15 +78,16 @@ public class WriteSmsFileGenerator {
                     writer.println((string));
                 }
             });
-            fos.close();
-        } catch (IOException var5) {
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
         }
 
         return count;
     }
 
     public int printResult() {
-        int count = this.printResult(new WriteSmsFileGenerator.Printer() {
+        int count = printResult(new Printer() {
             public void print(String string) {
                 System.out.println(string);
             }
@@ -96,19 +95,21 @@ public class WriteSmsFileGenerator {
         return count;
     }
 
-    public int printResult(WriteSmsFileGenerator.Printer printer) {
+    public int printResult(Printer printer) {
         int count = 0;
-        if (this.mReader != null) {
-            while (this.mReader.next()) {
+        int index = 0;
+        if (mReader != null) {
+            while (mReader.hasNext()) {
+                mReader.next();
                 try {
-                    String e = this.mReader.getStringByIndex(this.mPortIndex);
+                    String port = this.mReader.getStringByIndex(this.mPortIndex);
                     String content = this.mReader.getStringByIndex(this.mContentIndex);
-                    if (this.mSkiper == null || !this.mSkiper.isNeedSkip(e, content)) {
-                        printer.print(e + "$;$" + content + "$;$" + this.mTime);
+                    if (this.mSkiper == null || !this.mSkiper.isNeedSkip(index++, port, content)) {
+                        printer.print(port + SPLIT + content + SPLIT + this.mTime);
                         ++count;
                     }
-                } catch (Exception var5) {
-                    System.out.println(var5);
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
             }
         }
@@ -116,11 +117,5 @@ public class WriteSmsFileGenerator {
         return count;
     }
 
-    public interface Printer {
-        void print(String string);
-    }
 
-    public interface Skiper {
-        boolean isNeedSkip(String port, String content);
-    }
 }

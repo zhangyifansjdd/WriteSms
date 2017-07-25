@@ -1,46 +1,34 @@
 package com.zyf.excel;
 
+import com.zyf.i.Cursor;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
  * Created by ZhangYifan on 2017/7/24.
  */
-public class ExcelReader {
+public class ExcelReader implements Cursor<String> {
     private File mFile;
     private ArrayList<ArrayList<Object>> mData;
     private ArrayList<Object> mCurrentList;
     private Iterator<ArrayList<Object>> mCurrentIterator;
 
-    public static ExcelReader createFromFile(File file) throws FileNotFoundException {
-        if(file != null && file.exists() && file.isFile()) {
-            return new ExcelReader(file);
-        } else {
-            throw new FileNotFoundException("文件：" + file.getAbsolutePath() + "找不到！");
-        }
-    }
-
-    public static void createFromFile(final File file, final ExcelReader.OnExcelLoadListener listener) throws FileNotFoundException {
-        if(file != null && file.exists() && file.isFile()) {
+    public static void createFromFile(final File file, int sheetIndex, final ExcelReader.OnExcelLoadListener listener) throws FileNotFoundException {
+        if (file != null && file.exists() && file.isFile()) {
             (new Thread("LoadExcelThread") {
                 public void run() {
-                    try {
-                        ExcelReader reader = ExcelReader.createFromFile(file);
-                        if(listener != null) {
-                            if(reader != null) {
-                                listener.onLoad(reader);
-                            } else {
-                                listener.onLoad(null);
-                            }
-                        }
-                    } catch (FileNotFoundException var2) {
-                        if(listener != null) {
+                    ExcelReader reader = new ExcelReader(file, sheetIndex);
+                    if (listener != null) {
+                        if (reader != null) {
+                            listener.onLoad(reader);
+                        } else {
                             listener.onLoad(null);
                         }
                     }
-
                 }
             }).start();
         } else {
@@ -48,32 +36,44 @@ public class ExcelReader {
         }
     }
 
-    private ExcelReader(File file) {
+    public ExcelReader(File file) {
+        this(file, 0);
+    }
+
+    public ExcelReader(File file, int sheetIndex) {
         this.mFile = file;
-        initData();
+        mData = ExcelUtil.readExcel(mFile, sheetIndex);
+        moveToFirst();
     }
 
     public File getFile() {
         return mFile;
     }
 
-    private void initData() {
-        mData = ExcelUtil.readExcel(mFile);
-        mCurrentIterator = mData.iterator();
+    @Override
+    public boolean hasNext() {
+        return mCurrentIterator.hasNext();
     }
 
-    public boolean next() {
-        boolean hasNext = this.mCurrentIterator.hasNext();
-        if(hasNext) {
-            this.mCurrentList = (ArrayList)mCurrentIterator.next();
-        }
-
-        return hasNext;
+    @Override
+    public String next() {
+        mCurrentList = mCurrentIterator.next();
+        return Arrays.toString(mCurrentList.toArray());
     }
 
     public String getStringByIndex(int i) {
-        String s = (String)this.mCurrentList.get(i);
-        return s;
+        String result = "";
+        try {
+            result = (String) mCurrentList.get(i);
+        } catch (Exception e) {
+//            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public void moveToFirst() {
+        mCurrentIterator = mData.iterator();
     }
 
     public interface OnExcelLoadListener {

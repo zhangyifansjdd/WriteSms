@@ -7,7 +7,7 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-def mainClassName = "com.zyf.Main"
+def mainClassName = "com.zyf.program.WriteSmsMain"
 jar{
     manifest {
         attributes "Main-Class": "$mainClassName"
