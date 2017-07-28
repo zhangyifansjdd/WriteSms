@@ -3,8 +3,11 @@ package com.zyf.writesms;
 import com.zyf.excel.ExcelReader;
 import com.zyf.i.Printer;
 import com.zyf.i.Skiper;
+import com.zyf.i.SmsProcesser;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by ZhangYifan on 2017/7/24.
@@ -14,6 +17,7 @@ public class WriteSmsFileGenerator {
     private static final String DEFAULT_TIME = "2016-12-05 10:24:03";
     private ExcelReader mReader;
     private Skiper mSkiper;
+    private SmsProcesser mSmsProcesser;
     private int mPortIndex = -1;
     private int mContentIndex = -1;
     private String mTime = DEFAULT_TIME;
@@ -21,10 +25,17 @@ public class WriteSmsFileGenerator {
 
     public WriteSmsFileGenerator(ExcelReader reader) {
         this.mReader = reader;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        mTime = format.format(new Date());
     }
 
     public WriteSmsFileGenerator setSkiper(Skiper skiper) {
         this.mSkiper = skiper;
+        return this;
+    }
+
+    public WriteSmsFileGenerator setSmsProcesser(SmsProcesser smsProcesser) {
+        this.mSmsProcesser = smsProcesser;
         return this;
     }
 
@@ -104,8 +115,15 @@ public class WriteSmsFileGenerator {
                 try {
                     String port = this.mReader.getStringByIndex(this.mPortIndex);
                     String content = this.mReader.getStringByIndex(this.mContentIndex);
-                    if (this.mSkiper == null || !this.mSkiper.isNeedSkip(index++, port, content)) {
-                        printer.print(port + SPLIT + content + SPLIT + this.mTime);
+                    if (mSkiper == null || !mSkiper.isNeedSkip(index++, port, content)) {
+//
+//
+
+                        if (mSmsProcesser != null) {
+                            printer.print(mSmsProcesser.processPort(port) + SPLIT + mSmsProcesser.processSms(content) + SPLIT + this.mTime);
+                        } else {
+                            printer.print(port + SPLIT + content + SPLIT + this.mTime);
+                        }
                         ++count;
                     }
                 } catch (Exception e) {

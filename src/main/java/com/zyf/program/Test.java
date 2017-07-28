@@ -1,7 +1,5 @@
 package com.zyf.program;
 
-import com.zyf.util.RegexUtil;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,12 +11,29 @@ public class Test {
 
     public static void main(String[] args) {
 
-        String model="恭喜您${txt_状态}，请凭出票码到${txt_取票地址}。取票码:${txt_取票码}，影院:${txt_影厅}，影片:${txt_影片名称}，放映时间:${txt_观影时间}，祝您观影愉快！客服电话${txt_联系电话}【百度糯米电影】";
-        String yuanwen="恭喜您已成功购票，请凭出票码到影院大厅中<万达出票机>自助取票。取票码:62980853471607，影院:海口万达国际影城(万国大都会店)，影片:鬼吹灯之寻龙诀，放映时间:2015-12-24 20:10(周四)，祝您观影愉快！客服电话4006099866【百度糯米电影】";
+        String port="10086.00";
+        if (port.contains(".")) {
+            port = port.substring(0, port.indexOf("."));
+        }
+        System.out.println(port);
 
-        boolean result= RegexUtil.matchSmsModel(yuanwen,model,true);
+//        System.out.println("打印"+test());
 
-        System.out.println("ddddd");
+
+//        String url = "https://221.176.66.230:20001/api/smschannelcontent";
+//        HashMap<String, String> params = new HashMap<>();
+//        params.put("TmpType", "1");
+//        params.put("StyleSheet", "none");
+//        params.put("Opttype", "all");
+//        params.put("Sourport", "10086");
+//
+//        try {
+//            String s= HttpUtil.postByHttp(url,params);
+//            System.out.println(s);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
 
 //        File file = new File("G:\\SmsContet\\去重前.txt");
 //        File targetFile = new File("G:\\SmsContet\\去重后.txt");
@@ -93,6 +108,15 @@ public class Test {
 //        }
 //
 //        System.out.println("结束-------");
+    }
+
+    private static String test(){
+        try {
+            System.out.println("try");
+            return "fanhui";
+        } finally {
+            System.out.println("finally");
+        }
     }
 
     private static String findYuanwen(String line) {
