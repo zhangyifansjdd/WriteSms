@@ -19,6 +19,8 @@ public class WriteSmsMain {
      * @param args
      */
     public static void main(String[] args) {
+//        args = new String[]{"0", "0", "1", "G:\\SmsContet\\（运营商+银行+交通）测试用例原文20170413(1).xlsx"};
+
         System.out.println("--------开始执行-------");
         System.out.println("--------读取参数-------");
         String filePath = "";
