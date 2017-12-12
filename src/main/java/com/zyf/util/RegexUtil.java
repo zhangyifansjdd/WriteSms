@@ -10,21 +10,21 @@ import java.util.regex.Pattern;
  */
 public class RegexUtil {
 
-    protected static final String PLACE_HOLDER_REGULAR = "\\$\\{([^\\$\\{]*?)\\}";
-    protected static final String PLACE_HOLDER_REPLACE = "(.*?)";
-    protected static final String PLACE_HOLDER_REGULAR_GREEDY = "#\\{([^#\\{]*?)\\}";
-    protected static final String PLACE_HOLDER_REPLACE_GREEDY = "(.*)";
-    protected static final String MOBILE_PATTERN = "^(\\+86){0,1}[1][3,4,5,7,8][0-9]{9}$";
-    protected static final String IMAGE_PATTERN = "(http(s?):/)(/[^/]+)+\\.(?:jpg|jpeg|gif|png)";
-    protected static final String ONLY_PLACE_HOLDER_PATTERN = "\\$\\{[^}]*\\}";
-    protected static final String PLACE_HOLDER_ARRAY_REGULAR = "\\$\\{([^}]*?)\\[(.*?)\\]\\}";
-    protected static final String REPLACEMENT_FOR_LINE_BREAK = "~br#";
+    public static final String PLACE_HOLDER_REGULAR = "\\$\\{([^\\$\\{]*?)\\}";
+    public static final String PLACE_HOLDER_REPLACE = "(.*?)";
+    public static final String PLACE_HOLDER_REGULAR_GREEDY = "#\\{([^#\\{]*?)\\}";
+    public static final String PLACE_HOLDER_REPLACE_GREEDY = "(.*)";
+    public static final String MOBILE_PATTERN = "^(\\+86){0,1}[1][3,4,5,7,8][0-9]{9}$";
+    public static final String IMAGE_PATTERN = "(http(s?):/)(/[^/]+)+\\.(?:jpg|jpeg|gif|png)";
+    public static final String ONLY_PLACE_HOLDER_PATTERN = "\\$\\{[^}]*\\}";
+    public static final String PLACE_HOLDER_ARRAY_REGULAR = "\\$\\{([^}]*?)\\[(.*?)\\]\\}";
+    public static final String REPLACEMENT_FOR_LINE_BREAK = "~br#";
 
-    protected static boolean onlyPlaceHolder(String text) {
+    public static boolean onlyPlaceHolder(String text) {
         return match(text, ONLY_PLACE_HOLDER_PATTERN);
     }
 
-    protected static List<String> findImageUrls(String text) {
+    public static List<String> findImageUrls(String text) {
         List<String> list = new ArrayList<String>();
 
         Pattern pattern = Pattern.compile(IMAGE_PATTERN);
@@ -37,7 +37,7 @@ public class RegexUtil {
         return list;
     }
 
-    protected static boolean isMobile(String number) {
+    public static boolean isMobile(String number) {
         if (number == null) {
             return false;
         }
@@ -48,38 +48,18 @@ public class RegexUtil {
         return match(sms, patternPreFilter(model, convertSpecialChar));
     }
 
-    protected static List<String> findSmsModelArrayKeys(String model) {
+    public static List<String> findSmsModelArrayKeys(String model) {
         return findAllMatchedGroups(model, RegexUtil.PLACE_HOLDER_ARRAY_REGULAR);
     }
 
-    protected static List<String> findSmsModelKeys(String model) {
+    public static List<String> findSmsModelKeys(String model) {
         if (model != null && model.contains("#{")) {
             model = model.replace("#{", "${");
         }
         return findAllMatchedGroups(model, PLACE_HOLDER_REGULAR);
     }
 
-    protected static List<String> findSmsModelValues(String sms, String model, boolean convertSpecialChar) {
-        return findAllMatchedGroups(sms, patternPreFilter(model, convertSpecialChar));
-    }
-
-
-    protected static String removeSpaceAndLine(String text) {
-        if (text == null) {
-            return text;
-        }
-        return text.replace("\\r\\n", "")
-                .replace("\r\n", "")
-                .replace("\\r", "")
-                .replace("\r", "")
-                .replace("\\n", "")
-                .replace("\n", "")
-                .replace("\\t", "")
-                .replace("\t", "")
-                .replace(" ", "");
-    }
-
-    protected static String removeSpaceAndReplaceLine(String text) {
+    public static String removeSpaceAndReplaceLine(String text) {
         if (text == null) return null;
 
         return text.replaceAll("(\\\\r\\\\n)+", "\n")
@@ -93,7 +73,7 @@ public class RegexUtil {
                 .replace(" ", "");
     }
 
-    protected static String convertPatternChar(String pattern, boolean convertSpecialChar) {
+    public static String convertPatternChar(String pattern, boolean convertSpecialChar) {
         if (pattern == null) return null;
 
         // 正则表达式中的特殊符号：* . ? + $ ^ [] ( ) {} | \
@@ -116,7 +96,7 @@ public class RegexUtil {
         return pattern;
     }
 
-    private static List<String> findAllMatchedGroups(String origin, String regular) {
+    public static List<String> findAllMatchedGroups(String origin, String regular) {
         List<String> list = new ArrayList<String>();
         try {
             int lastIndex = regular.lastIndexOf(PLACE_HOLDER_REPLACE);
@@ -140,23 +120,27 @@ public class RegexUtil {
         return list;
     }
 
-    private static boolean match(String origin, String regular) {
+    public static boolean match(String origin, String regular) {
+//        【湖北农信】您尾号为{txt_账号}的卡号于{txt_时间}转出金额{txt_支出金额}，余额{txt_账户余额}，交易网点省清算中心。
         boolean result = false;
+
         try {
             Matcher m = matcher(origin, regular);
             result = m.matches();
         } catch (Exception e) {
-
+            e.printStackTrace();
+            System.out.println("origin:"+origin);
+            System.out.println("regular:"+regular);
         }
         return result;
     }
 
-    private static Matcher matcher(String origin, String regular) {
+    public static Matcher matcher(String origin, String regular) {
         Pattern p = Pattern.compile(regular, Pattern.DOTALL);
         return p.matcher(origin);
     }
 
-    private static String patternPreFilter(String pattern, boolean convertSpecialChar) {
+    public static String patternPreFilter(String pattern, boolean convertSpecialChar) {
         pattern = convertPatternChar(pattern, convertSpecialChar);
 
         if (pattern == null) return null;

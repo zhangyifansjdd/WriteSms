@@ -14,10 +14,12 @@ public class SmsContentCursor_Excel implements SmsCursor {
     ExcelReader excelReader;
     int sheetIndex;
     int contentIndex;
+    int portIndex;
 
-    public SmsContentCursor_Excel(String excelFilePath, int sheetIndex, int contentIndex) {
+    public SmsContentCursor_Excel(String excelFilePath, int sheetIndex, int portIndex, int contentIndex) {
         this.excelFile = new File(excelFilePath);
         this.sheetIndex = sheetIndex;
+        this.portIndex=portIndex;
         this.contentIndex = contentIndex;
         excelReader = new ExcelReader(excelFile, this.sheetIndex);
     }
@@ -25,6 +27,11 @@ public class SmsContentCursor_Excel implements SmsCursor {
     @Override
     public String getNextSms() {
         return getStringByIndex(contentIndex);
+    }
+
+    @Override
+    public String getNextPort() {
+        return getStringByIndex(portIndex);
     }
 
     @Override

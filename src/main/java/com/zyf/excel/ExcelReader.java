@@ -5,17 +5,14 @@ import com.zyf.i.Cursor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * Created by ZhangYifan on 2017/7/24.
  */
-public class ExcelReader implements Cursor<String> {
+public class ExcelReader implements Cursor {
     private File mFile;
     private ArrayList<ArrayList<Object>> mData;
-    private ArrayList<Object> mCurrentList;
-    private Iterator<ArrayList<Object>> mCurrentIterator;
+    private int mCurrentRowIndex;
 
     public static void createFromFile(final File file, int sheetIndex, final ExcelReader.OnExcelLoadListener listener) throws FileNotFoundException {
         if (file != null && file.exists() && file.isFile()) {
@@ -43,40 +40,76 @@ public class ExcelReader implements Cursor<String> {
     public ExcelReader(File file, int sheetIndex) {
         this.mFile = file;
         mData = ExcelUtil.readExcel(mFile, sheetIndex);
-        moveToFirst();
+        moveToPrevious();
     }
 
     public File getFile() {
         return mFile;
     }
 
-    @Override
-    public boolean hasNext() {
-        return mCurrentIterator.hasNext();
+    public ArrayList<ArrayList<Object>> getData() {
+        return mData;
     }
 
     @Override
-    public String next() {
-        mCurrentList = mCurrentIterator.next();
-        return Arrays.toString(mCurrentList.toArray());
+    public int getRowCount() {
+        return mData.size();
     }
 
+    @Override
+    public int getColumnCount() {
+        return mData.get(0).size();
+    }
+
+    @Override
+    public boolean moveToPrevious() {
+        mCurrentRowIndex = -1;
+        return mData != null && mData.size() > 0;
+    }
+
+    @Override
     public String getStringByIndex(int i) {
         String result = "";
         try {
-            result = (String) mCurrentList.get(i);
+            result = (String) mData.get(mCurrentRowIndex).get(i);
         } catch (Exception e) {
-//            e.printStackTrace();
         }
         return result;
     }
 
+    public ArrayList<Object> getCurrentRow(){
+        return mData.get(mCurrentRowIndex);
+    }
+
     @Override
-    public void moveToFirst() {
-        mCurrentIterator = mData.iterator();
+    public boolean moveToFirst() {
+        mCurrentRowIndex = 0;
+        return mData != null && mData.size() > 0;
+    }
+
+    @Override
+    public boolean moveToNext() {
+        boolean hasNext = false;
+        if (mData != null && mData.size() > 0 && mCurrentRowIndex < getRowCount() - 1) {
+            mCurrentRowIndex++;
+            hasNext = true;
+        }
+        return hasNext;
+    }
+
+    @Override
+    public boolean moveToPosition(int position) {
+        mCurrentRowIndex = position;
+        return mData != null && mData.size() > 0;
+    }
+
+    @Override
+    public void close() {
+        mData = null;
+        System.gc();
     }
 
     public interface OnExcelLoadListener {
-        void onLoad(ExcelReader var1);
+        void onLoad(ExcelReader excelReader);
     }
 }

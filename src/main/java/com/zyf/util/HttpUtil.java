@@ -81,6 +81,11 @@ public class HttpUtil {
         conn.setReadTimeout(HttpSets.MAX_READ_TIME);
         conn.setConnectTimeout(HttpSets.MAX_CONNECT_TIME);
 
+        conn.setUseCaches(false);
+        conn.setRequestMethod("POST");
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+
         SSLContext ssl = SSLContext.getInstance(SSL_PROTOCOL);
         ssl.init(null, new TrustManager[]{new AllTrustManager()}, new SecureRandom());
         conn.setSSLSocketFactory(ssl.getSocketFactory());

@@ -19,7 +19,7 @@ public class WriteSmsMain {
      * @param args
      */
     public static void main(String[] args) {
-//        args = new String[]{"0", "0", "1", "G:\\SmsContet\\（运营商+银行+交通）测试用例原文20170413(1).xlsx"};
+        args = new String[]{"0", "1", "11", "G:\\SmsContet\\出一批.xlsx"};
 
         System.out.println("--------开始执行-------");
         System.out.println("--------读取参数-------");
@@ -38,6 +38,7 @@ public class WriteSmsMain {
             System.out.println("filePath : " + filePath);
         }
 
+
         File excelFile = new File(filePath);
         ExcelReader reader = new ExcelReader(excelFile, sheetIndex);
         System.out.println("--------开始写入文件-------");
@@ -50,6 +51,9 @@ public class WriteSmsMain {
                         boolean result = false;
                         if (port == null || port.length() == 0 || content == null || content.length() == 0) {
                             result = true;
+                        }
+                        if (i++%15!=0){
+                            result=true;
                         }
                         return result;
                     }
@@ -71,4 +75,6 @@ public class WriteSmsMain {
         int count = writeSmsFileGenerator.writeResult2File();
         System.out.println("--写入" + +count + "------结束---------");
     }
+
+    static int i=0;
 }

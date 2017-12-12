@@ -110,15 +110,11 @@ public class WriteSmsFileGenerator {
         int count = 0;
         int index = 0;
         if (mReader != null) {
-            while (mReader.hasNext()) {
-                mReader.next();
+            while (mReader.moveToNext()) {
                 try {
                     String port = this.mReader.getStringByIndex(this.mPortIndex);
                     String content = this.mReader.getStringByIndex(this.mContentIndex);
                     if (mSkiper == null || !mSkiper.isNeedSkip(index++, port, content)) {
-//
-//
-
                         if (mSmsProcesser != null) {
                             printer.print(mSmsProcesser.processPort(port) + SPLIT + mSmsProcesser.processSms(content) + SPLIT + this.mTime);
                         } else {
@@ -134,6 +130,4 @@ public class WriteSmsFileGenerator {
 
         return count;
     }
-
-
 }
